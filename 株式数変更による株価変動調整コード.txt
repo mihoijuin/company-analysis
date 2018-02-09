@@ -1,0 +1,192 @@
+sqlite> --株価の急激な値動き=発行済み株式の変更分dataの調整
+sqlite>
+sqlite> --financialStatement確認
+sqlite> --企業id,株価,年度を取得
+sqlite> SELECT company_id, year, stock_price
+   ...> FROM    financialStatement;
+company_id  year        stock_price
+----------  ----------  -----------
+5367        2016        407
+4543        2017        5340
+4543        2016        4315
+4543        2015        3718
+4543        2014        2757
+4543        2013        5070
+5367        2013        411
+5367        2014        402
+5367        2015        407
+5367        2017        1066
+3669        2013        2770
+3669        2014        842
+3669        2015        467
+3669        2017        361
+8527        2013        5030
+8527        2014        5980
+8527        2015        6450
+8527        2016        6600
+8527        2017        5350
+3669        2016        371
+6305        2013        2245
+6305        2014        2568
+6305        2015        1898
+6305        2016        2531
+6305        2017        4095
+5302        2013        198
+5302        2014        229
+5302        2015        306
+5302        2016        227
+5302        2017        5070
+4186        2013        2249
+4186        2014        3700
+4186        2015        3865
+4186        2016        3940
+4186        2017        4865
+6752        2013        1224
+6752        2014        1427
+6752        2015        1241
+6752        2016        1190
+6752        2017        1650
+8589        2013        151
+8589        2014        134
+8589        2015        107
+8589        2016        118
+8589        2017        110
+sqlite> --企業順,年度順に
+sqlite> SELECT company_id, year, stock_price
+   ...> FROM    financialStatement
+   ...> ORDER BY company_id, year;
+company_id  year        stock_price
+----------  ----------  -----------
+3669        2013        2770
+3669        2014        842
+3669        2015        467
+3669        2016        371
+3669        2017        361
+4186        2013        2249
+4186        2014        3700
+4186        2015        3865
+4186        2016        3940
+4186        2017        4865
+4543        2013        5070
+4543        2014        2757
+4543        2015        3718
+4543        2016        4315
+4543        2017        5340
+5302        2013        198
+5302        2014        229
+5302        2015        306
+5302        2016        227
+5302        2017        5070
+5367        2013        411
+5367        2014        402
+5367        2015        407
+5367        2016        407
+5367        2017        1066
+6305        2013        2245
+6305        2014        2568
+6305        2015        1898
+6305        2016        2531
+6305        2017        4095
+6752        2013        1224
+6752        2014        1427
+6752        2015        1241
+6752        2016        1190
+6752        2017        1650
+8527        2013        5030
+8527        2014        5980
+8527        2015        6450
+8527        2016        6600
+8527        2017        5350
+8589        2013        151
+8589        2014        134
+8589        2015        107
+8589        2016        118
+8589        2017        110
+sqlite>
+sqlite> --company_id:3669&5302&5367が修正必要
+sqlite> --該当idの部分のみ抽出
+sqlite> SELECT company_id, year, stock_price
+   ...> FROM    financialStatement
+   ...> WHERE   company_id = '3669'
+   ...> OR      company_id = '5302'
+   ...> OR      company_id = '5367'
+   ...> ORDER BY company_id, year;
+company_id  year        stock_price
+----------  ----------  -----------
+3669        2013        2770
+3669        2014        842
+3669        2015        467
+3669        2016        371
+3669        2017        361
+5302        2013        198
+5302        2014        229
+5302        2015        306
+5302        2016        227
+5302        2017        5070
+5367        2013        411
+5367        2014        402
+5367        2015        407
+5367        2016        407
+5367        2017        1066
+sqlite>
+sqlite> --モバイルクリエイトは2014年に1:4の株式分割
+sqlite> --参考:https://www.e-cap.co.jp/StockInfo/Archive/3669
+sqlite> --よって2013年の株価を1/4する
+sqlite> UPDATE financialStatement
+   ...> SET     stockprice /= 4
+   ...> WHERE   company_id = '3669'
+   ...> AND     year = '2013';
+Error: near "/": syntax error
+sqlite> UPDATE financialStatement
+   ...> SET     stock_price /= 4
+   ...> WHERE   company_id = '3669'
+   ...> AND     year = '2013';
+Error: near "/": syntax error
+sqlite> UPDATE financialStatement
+   ...> SET     stock_price = stock_price / 4
+   ...> WHERE   company_id = '3669'
+   ...> AND     year = '2013';
+sqlite>
+sqlite> --確認
+sqlite> --の前に他のも変えちゃおう
+sqlite> --5302日本カボンは2017年に株式併合で株式数1/10に
+sqlite> --参考:https://www.carbon.co.jp/topics/upload_pdf/topics_170210_02.pdf
+sqlite> --よって2017以前の株価を1/10にする
+sqlite> UPDATE financialStatement
+   ...> ;
+Error: near ";": syntax error
+sqlite> --ミス株価を10倍にする
+sqlite> UPDATE financialStatement
+   ...> SET     stock_price = stock_price * 10
+   ...> WHERE   company_id = '5302'
+   ...> AND     NOT year = '2017';
+sqlite>
+sqlite> --5367ニッカトは調べたところ自然と株価上昇した模様
+sqlite> --参考:https://kabuoji3.com/stock/5367/2017/
+sqlite> --よって変更なし
+sqlite>
+sqlite> --確認
+sqlite> SELECT company_id, year, stock_price
+   ...> FROM    financialStatement
+   ...> WHERE   company_id = '3669'
+   ...> OR      company_id = '5302'
+   ...> OR      company_id = '5367'
+   ...> ORDER BY company_id, year;
+company_id  year        stock_price
+----------  ----------  -----------
+3669        2013        692
+3669        2014        842
+3669        2015        467
+3669        2016        371
+3669        2017        361
+5302        2013        1980
+5302        2014        2290
+5302        2015        3060
+5302        2016        2270
+5302        2017        5070
+5367        2013        411
+5367        2014        402
+5367        2015        407
+5367        2016        407
+5367        2017        1066
+sqlite>

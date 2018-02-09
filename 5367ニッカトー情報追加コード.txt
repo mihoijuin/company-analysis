@@ -1,0 +1,204 @@
+$ sqlite3 C:\Users\NEC-PCuser\OneDrive\Programing\SQL\companyAnalysis.db
+SQLite version 3.20.1 2017-08-24 16:21:36
+Enter ".help" for usage hints.
+sqlite> .table
+company             financialStatement  industry            listed
+sqlite> .header on
+sqlite> .mode column
+sqlite> --ニッカトの業界tableを作成
+sqlite> INSERT INTO industry
+   ...> VALUES(1, 'Maker');
+sqlite>
+sqlite> --会社情報を追加
+sqlite> INSERT INTO company
+   ...> ;
+Error: near ";": syntax error
+sqlite> --の前に設立年とかをINTEGERにする
+sqlite> --table名変更
+sqlite> ALTER TABLE company RENAME TO tmp_company;
+sqlite> --table作成
+sqlite> CREATE TABLE company(
+   ...> id CHAR(4) PRIMARY KEY,
+   ...> name VARCHAR(30),
+   ...> industry_id INTEGER REFERENCES industry(id),
+   ...> listed_id CHAR(1) REFERENCES listed(id),
+   ...> establishd_year INTEGER,
+   ...> listed_year INTEGER,
+   ...> market_cap INTEGER
+   ...> );
+sqlite> --古いtableを削除
+sqlite> DROP TABLE tmp_company;
+sqlite> --ALTER操作で不要な情報が残っているので最適化
+sqlite> VACUUM;
+sqlite>
+sqlite> --ニッカトの会社情報を入力
+sqlite> INSERT INTO company
+   ...> VALUES('5367', 'ニッカト', 1, '1', 1921, 1963, 124); --時価総額の単位は億
+sqlite>
+sqlite> --財務情報を追加
+sqlite> INSERT INTO financialStatement
+   ...> VALUES('5367', '2016', 8577, 594, 633, 412, NULL, NULL, NULL, NULL, 407); --株
+sqlite> --(上)株価は2016年末の終値
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM listed;
+id          name
+----------  ----------
+1           東証一部
+sqlite> SELECT * FROM industry;
+id          name
+----------  ----------
+1           Maker
+sqlite> SELECT * FROM company;
+id          name        industry_id  listed_id   establishd_year  listed_year  market_cap
+----------  ----------  -----------  ----------  ---------------  -----------  ----------
+5367        ニッカト        1            1           1921             1963         124
+sqlite> SELECT * FROM financialStatement;
+company_id  year        sales       operating_income  ordinary_income  net_income  cash        operating_CF  investing_CF  financing_CF  stock_price
+----------  ----------  ----------  ----------------  ---------------  ----------  ----------  ------------  ------------  ------------  -----------
+5367        2016        8577        594               633              412                                                               407
+sqlite>
+
+sqlite> --ニッカトの他の情報を入力
+sqlite> --5367ニッカト
+sqlite> --設定
+sqlite> .headers on
+sqlite> .mode column
+sqlite>
+sqlite> INSERT INTO financialStatement
+   ...> VALUES
+   ...> ('5367', '2013'7696
+   ...>
+   ...> ;
+Error: near "7696": syntax error
+sqlite> INSERT INTO financialStatement
+   ...> VALUES
+   ...> ('5367', '2013', 7696, 422, 443, 246, NULL, NULL, NULL, NULL, 411),
+   ...> ('5367', '2014', 7909, 346, 326, 191, NULL, NULL, NULL, NULL, 402),
+   ...> ('5367', '2015', 8773, 440, 468, 285, NULL, NULL, NULL, NULL, 407),
+   ...> ('5367', '2017', 8919, 667, 703, 477, NULL, NULL, NULL, NULL, 1066)
+   ...> ;
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM financialStatement;
+company_id  year        sales       operating_income  ordinary_income  net_income  cash        operating_CF  investing_CF  financing_CF  stock_price
+----------  ----------  ----------  ----------------  ---------------  ----------  ----------  ------------  ------------  ------------  -----------
+5367        2016        8577        594               633              412                                                               407
+4543        2017        514164      76578             68552            54225                                                             5340
+4543        2016        525026      81703             73090            50626                                                             4315
+4543        2015        489506      67456             70730            38470                                                             3718
+4543        2014        467359      65288             63802            34096                                                             2757
+4543        2013        402294      53216             51376            47014                                                             5070
+5367        2013        7696        422               443              246                                                               411
+5367        2014        7909        346               326              191                                                               402
+5367        2015        8773        440               468              285                                                               407
+5367        2017        8919        667               703              477                                                               1066
+sqlite>
+<<<<<<< HEAD
+
+=======
+>>>>>>> branch1
+sqlite> --ニッカトのCFなどを追加
+sqlite> --2013年
+sqlite> INSERT INTO financialStatement
+   ...> (cash, operating_CF, investing_CF, financing_CF)
+   ...> VALUES(1178, 706, -939, -94)
+   ...> WHERE   company_id = '5367'
+   ...> AND     year = '2013' ;
+Error: near "WHERE": syntax error
+sqlite> --ミスUPDATEやん
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 1178,
+   ...>         operating_CF = 706,
+   ...>         investing_CF = -939,
+   ...>         financing_CF = -94
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2013' ;
+sqlite>
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 1690,
+   ...>         operating_CF = 993,
+   ...>         investing_CF = -166,
+   ...>         financing_CF = -314
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2014' ;
+sqlite>
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 1762,
+   ...>         operating_CF = 260,
+   ...>         investing_CF = -198,
+   ...>         financing_CF = --141
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2015' ;
+Error: near "WHERE": syntax error
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 1762,
+   ...>         operating_CF = 260,
+   ...>         investing_CF = -198,
+   ...>         financing_CF = -141
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2015' ;
+sqlite>
+sqlite> --2016
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 1810,
+   ...>         operating_CF = 1638,
+   ...>         investing_CF = -1286,
+   ...>         financing_CF = -154
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2016' ;
+sqlite>
+sqlite> --2017
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 2892,
+   ...>         operating_CF = 1063,
+   ...>         investing_CF = -178,
+   ...> ;
+Error: near ";": syntax error
+sqlite> UPDATE financialStatement
+   ...> SET
+   ...>         cash = 2892,
+   ...>         operating_CF = 1063,
+   ...>         investing_CF = 178,
+   ...>         financing_CF = -189
+   ...> WHERE
+   ...>         company_id = '5367'
+   ...> AND     year = '2017' ;
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM financialSatement;
+Error: no such table: financialSatement
+sqlite> SELECT * FROM financialStatement;
+company_id  year        sales       operating_income  ordinary_income  net_income  cash        operating_CF  investing_CF  financing_CF  stock_price
+----------  ----------  ----------  ----------------  ---------------  ----------  ----------  ------------  ------------  ------------  -----------
+5367        2016        8577        594               633              412         1810        1638          -1286         -154          407
+4543        2017        514164      76578             68552            54225                                                             5340
+4543        2016        525026      81703             73090            50626                                                             4315
+4543        2015        489506      67456             70730            38470                                                             3718
+4543        2014        467359      65288             63802            34096                                                             2757
+4543        2013        402294      53216             51376            47014                                                             5070
+5367        2013        7696        422               443              246         1178        706           -939          -94           411
+5367        2014        7909        346               326              191         1690        993           -166          -314          402
+5367        2015        8773        440               468              285         1762        260           -198          -141          407
+5367        2017        8919        667               703              477         2892        1063          178           -189          1066
+3669        2013        2828        542               515              314         676         216           -230          475           2770
+3669        2014        4233        804               785              493                                                               842
+3669        2015        5234        572               1328             1112                                                              467
+3669        2016        5007        233               233              122                                                               371
+3669        2017                                                                                                                         361
+8527        2013        49701                         5325             2721        91001       21908         -33422        -803          5030
+8527        2014        49354                         8641             5140        138274      151708        -103340       -802          5980
+8527        2015        49298                         9735             5822        139407      37341         -35378        -836          6450
+8527        2016        48695                         8111             5257        104722      -31382        -2187         -940          6600
+8527        2017        50031                         7648             5067        164668      54254         5403          -868          5350

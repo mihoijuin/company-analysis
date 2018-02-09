@@ -1,0 +1,195 @@
+sqlite> --会社情報に業界区分カラムを追加(大雑把すぎたため)
+sqlite> --会社情報じゃなくてまずはindustry tableに追加だ
+sqlite> --industry table 確認
+sqlite> SELECT * FROM industry;
+id          name
+----------  ----------
+1           Maker
+2           IT
+3           金融
+sqlite> --業界区分tableを作った方が良さそう
+sqlite> CREATE TABLE industryDetail(
+   ...> id INTEGER PRIMARY KEY,
+   ...> name VARCHAR(20)
+   ...> );
+sqlite>
+sqlite> --company tableに業界区分欄を追加
+sqlite> --company table 確認
+sqlite> SELECT * FROM company;
+id          name        industry_id  listed_id   establishd_year  listed_year  market_cap
+----------  ----------  -----------  ----------  ---------------  -----------  ----------
+5367        ニッカト        1            1           1921             1963         124
+4543        テルモ         1            1           1921             1982         20735
+3669        モバイルクリエイト   2            1           2002             2012         85
+8527        愛知銀行        3            1           1944             1961         602
+6305        日立建機        1            1           1970             1981         9476
+5302        日本カボン       1            1           1915             1949         616
+4186        東京応化工業      1            1           1940             1986         2386
+6752        パナソニック      1            1           1935             1949         41616
+8589        アプラスファイナンシ  3            1           1956             1981         1783
+2922        なとり         1            1           1948             1999         305
+sqlite>
+sqlite> --追加
+sqlite> ALTER TABLE company ADD COLUMN industry_detail_id INTEGER REFERENCES industryDetail(id);
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM company;
+id          name        industry_id  listed_id   establishd_year  listed_year  market_cap  industry_detail_id
+----------  ----------  -----------  ----------  ---------------  -----------  ----------  ------------------
+5367        ニッカト        1            1           1921             1963         124
+4543        テルモ         1            1           1921             1982         20735
+3669        モバイルクリエイト   2            1           2002             2012         85
+8527        愛知銀行        3            1           1944             1961         602
+6305        日立建機        1            1           1970             1981         9476
+5302        日本カボン       1            1           1915             1949         616
+4186        東京応化工業      1            1           1940             1986         2386
+6752        パナソニック      1            1           1935             1949         41616
+8589        アプラスファイナンシ  3            1           1956             1981         1783
+2922        なとり         1            1           1948             1999         305
+sqlite>
+sqlite> --industryDetail tableに食料品を追加
+sqlite> INSERT INTO industry_Detail
+   ...> VALUES(1, '食料品');
+Error: no such table: industry_Detail
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(1, '食料品');
+sqlite>
+sqlite> --company tableのなとりにindustry_detail_idを追加
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 1
+   ...> WHERE   id = '2922';
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM industryDetail;
+id          name
+----------  ----------
+1           食料品
+sqlite> SELECT * FROM company;
+id          name        industry_id  listed_id   establishd_year  listed_year  market_cap  industry_detail_id
+----------  ----------  -----------  ----------  ---------------  -----------  ----------  ------------------
+5367        ニッカト        1            1           1921             1963         124
+4543        テルモ         1            1           1921             1982         20735
+3669        モバイルクリエイト   2            1           2002             2012         85
+8527        愛知銀行        3            1           1944             1961         602
+6305        日立建機        1            1           1970             1981         9476
+5302        日本カボン       1            1           1915             1949         616
+4186        東京応化工業      1            1           1940             1986         2386
+6752        パナソニック      1            1           1935             1949         41616
+8589        アプラスファイナンシ  3            1           1956             1981         1783
+2922        なとり         1            1           1948             1999         305         1
+sqlite>
+sqlite> --ニッカト業界区分情報追加
+sqlite> --industryDetailにガラス追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(2, 'ガラス');
+sqlite>
+sqlite> --companyに追加
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 2
+   ...> WHERE   company_id = 5367;
+Error: no such column: company_id
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 2
+   ...> WHERE   id = 5367;
+sqlite>
+sqlite> --4543テルモ業界区分情報追加
+sqlite> --industryDetailに精密追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(3, '精密');
+sqlite>
+sqlite> --companyについか　
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 3
+   ...> WHERE   id = '4543';
+sqlite>
+sqlite>
+sqlite> --3669モバイルクリエイト業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(4, '情報通信');
+sqlite>
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 4
+   ...> WHERE   id = '3669';
+sqlite>
+sqlite>
+sqlite> --8527愛知銀行業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(5, '銀行');
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 5
+   ...> WHERE   id = '8527';
+sqlite>
+sqlite> --6305日立建機業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(6, '機械');
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 6
+   ...> WHERE   id = '6305';
+sqlite>
+sqlite> --5302日本カボン業界区分情報追加
+sqlite> --区分は2,ガラス
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 2
+   ...> WHERE   id = '5302';
+sqlite>
+sqlite> --4186東京応化工業業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(7, '化学');
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 7
+   ...> WHERE   id = '4186';
+sqlite>
+sqlite> --6752パナソニック業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(8, '電機');
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 8
+   ...> WHERE   id = '6752';
+sqlite>
+sqlite> --8589アプラスファイナンシャル業界区分情報追加
+sqlite> --industryDetailに情報通信追加
+sqlite> INSERT INTO industryDetail
+   ...> VALUES(9, '他金融');
+sqlite> --companyについか
+sqlite> UPDATE company
+   ...> SET     industry_detail_id = 9
+   ...> WHERE   id = '8589';
+sqlite>
+sqlite> --確認
+sqlite> SELECT * FROM industryDetail;
+id          name
+----------  ----------
+1           食料品
+2           ガラス
+3           精密
+4           情報通信
+5           銀行
+6           機械
+7           化学
+8           電機
+9           他金融
+sqlite> SELECT * FROM company;
+id          name        industry_id  listed_id   establishd_year  listed_year  market_cap  industry_detail_id
+----------  ----------  -----------  ----------  ---------------  -----------  ----------  ------------------
+5367        ニッカト        1            1           1921             1963         124         2
+4543        テルモ         1            1           1921             1982         20735       3
+3669        モバイルクリエイト   2            1           2002             2012         85          4
+8527        愛知銀行        3            1           1944             1961         602         5
+6305        日立建機        1            1           1970             1981         9476        6
+5302        日本カボン       1            1           1915             1949         616         2
+4186        東京応化工業      1            1           1940             1986         2386        7
+6752        パナソニック      1            1           1935             1949         41616       8
+8589        アプラスファイナンシ  3            1           1956             1981         1783        9
+2922        なとり         1            1           1948             1999         305         1
+sqlite>

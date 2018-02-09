@@ -1,0 +1,76 @@
+
+$ sqlite3 C:\Users\NEC-PCuser\OneDrive\Programing\SQL\stockprice.db
+SQLite version 3.20.1 2017-08-24 16:21:36
+Enter ".help" for usage hints.
+sqlite> .table
+sqlite> PRAGMA foreigh_keys = ON;
+sqlite> PRAGMA foreign_keys = ON;
+sqlite> PRAGMA foreign_keys;
+1
+sqlite> .headers on
+sqlite> CREATE TABLE industry(
+   ...> industry_id INTEGER PRIMARY KEY,
+   ...> industry_name VARCHAR(10)
+   ...> );
+sqlite> .table
+industry
+sqlite> CREATE TABLE listed(
+   ...> listed_id INTEGER PRIMARY KEY,
+   ...> listed_name VARCHAR(10)
+   ...> );
+sqlite> CREATE TABLE company(
+   ...> company_id CHAR(4) PRIMARY KEY,
+   ...> company_name VARCHAR(20),
+   ...> industry_id INTEGER,
+   ...> listed_id INTEGER,
+   ...> established_year CHAR(4),
+   ...> listed_year CHAR(4),
+   ...> market_cap INTEGER,
+   ...> FOREIGN KEY(industry_id) REFERENCES industry(industry_id),
+   ...> FOREIGN KEY(listed_id) REFERENCES listed(listed_id)
+   ...> );
+sqlite> .table
+company   industry  listed
+sqlite> CREATE TABLE financialStatement(
+   ...> companey_id CHAR(4),
+   ...> year CHAR(4),
+   ...> sales INTEGER,
+   ...> operating_income INTEGER,
+   ...> ordinary_income INTEGER,
+   ...> net_income INTEGER,
+   ...> cash INTEGER,
+   ...> operating_CF INTEGER,
+   ...> investing_CF INTEGER,
+   ...> financing_CF INTEGER,
+   ...> stock_price INTEGER,
+   ...> FOREIGN KEY(companey_id) REFERENCES companey(companey_id),
+   ...> );
+Error: near ")": syntax error
+sqlite> CREATE TABLE financialStatement(
+   ...> companey_id CHAR(4),
+   ...> year CHAR(4),
+   ...> sales INTEGER,
+   ...> operating_income INTEGER,
+   ...> ordinary_income INTEGER,
+   ...> net_income INTEGER,
+   ...> cash INTEGER,
+   ...> operating_CF INTEGER,
+   ...> investing_CF INTEGER,
+   ...> financing_CF INTEGER,
+   ...> stock_price INTEGER,
+   ...> FOREIGN KEY(companey_id) REFERENCES companey(companey_id)
+   ...> );
+sqlite> --上から順に業界情報table,上場市場table,会社情報table,財務情報tableを作成
+sqlite> --確認
+sqlite> .table
+company             financialStatement  industry            listed
+sqlite> --値をそれぞれ代入しておく(ファイルに残すため）
+sqlite> INSERT INTO listed
+   ...> VALUES(1, '東証一部')
+   ...> ;
+sqlite> SELECT * FROM companey;
+Error: no such table: companey
+sqlite> SELECT * FROM company;
+sqlite> SELECT * FROM listed;
+listed_id|listed_name
+1|東証一部

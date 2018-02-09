@@ -1,0 +1,52 @@
+$ sqlite3 C:\Users\NEC-PCuser\OneDrive\Programing\SQL\companyAnalysis.db
+SQLite version 3.20.1 2017-08-24 16:21:36
+Enter ".help" for usage hints.
+sqlite> --設定を調整
+sqlite> PRAGMA foreign_keys = ON;
+sqlite> PRAGMA foreign_keys;
+1
+sqlite> .headers on
+sqlite> .mode column
+sqlite>
+sqlite> --外部KEY調整版のtableを作成
+sqlite> --上場リストtableを作成
+sqlite> CREATE TABLE listed(
+   ...> id CHAR(1) PRIMARY KEY,
+   ...> name VARCHAR(20)
+   ...> );
+sqlite>
+sqlite> --業界リストtableを作成
+sqlite> CREATE TABLE industry(
+   ...> id INTEGER PRIMARY KEY,
+   ...> name VARCHAR(10)
+   ...> );
+sqlite>
+sqlite> --企業情報table を作成
+sqlite> CREATE TABLE company(
+   ...> id CHAR(4) PRIMARY KEY,
+   ...> name VARCHAR(30),
+   ...> industry_id INTEGER REFERENCES industry(id),
+   ...> listed_id CHAR(1) REFERENCES listed(id),
+   ...> established_year CHAR(4),
+   ...> listed_year CHAR(4),
+   ...> market_cap INTEGER
+   ...> );
+sqlite>
+sqlite> --財務情報tableを作成
+sqlite> CREATE TABLE financialStatement(
+   ...> company_id CHAR(4) REFERENCES company(id),
+   ...> year CHAR(4),
+   ...> sales INTEGER,
+   ...> operating_income INTEGER,
+   ...> ordinary_income INTEGER,
+   ...> net_income INTEGER,
+   ...> cash INTEGER,
+   ...> operating_CF INTEGER,
+   ...> investing_CF INTEGER,
+   ...> financing_CF INTEGER,
+   ...> stock_price INTEGER
+   ...> );
+sqlite>
+sqlite> --確認
+sqlite> .table
+company             financialStatement  industry            listed
